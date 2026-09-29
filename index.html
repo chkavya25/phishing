@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PhishGuard AI</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<nav><div class="brand">🛡️ PhishGuard AI</div><a href="/dashboard">Dashboard</a></nav>
+<main class="hero">
+  <section class="card">
+    <p class="eyebrow">AI CYBERSECURITY</p>
+    <h1>Phishing Website Detection</h1>
+    <p class="muted">Enter a website URL and analyze its URL-level characteristics with a machine-learning model.</p>
+    <div class="scanbox">
+      <input id="url" type="text" placeholder="https://example.com">
+      <button onclick="scan()">Scan URL</button>
+    </div>
+    <div id="status"></div>
+    <div id="result" class="result hidden"></div>
+  </section>
+  <section class="info-grid">
+    <div class="mini"><b>ML Model</b><span>Random Forest</span></div>
+    <div class="mini"><b>Analysis</b><span>URL Features</span></div>
+    <div class="mini"><b>Storage</b><span>SQLite History</span></div>
+  </section>
+</main>
+<script>
+async function scan(){
+  const url=document.getElementById("url").value.trim();
+  const status=document.getElementById("status");
+  const result=document.getElementById("result");
+  result.classList.add("hidden");
+  if(!url){status.textContent="Please enter a URL."; return;}
+  status.textContent="Scanning...";
+  try{
+    const r=await fetch("/scan",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.error||"Scan failed");
+    status.textContent="";
+    result.classList.remove("hidden");
+    result.innerHTML=`
+      <div class="badge ${d.prediction==='Phishing'?'danger':'safe'}">${d.prediction}</div>
+      <h2>${d.prediction==='Phishing'?'⚠️ Potential Phishing':'✅ Appears Legitimate'}</h2>
+      <p><b>Confidence:</b> ${d.confidence}%</p>
+      <h3>URL indicators</h3>
+      <ul>${d.reasons.map(x=>`<li>${x}</li>`).join("")}</ul>`;
+  }catch(e){status.textContent=e.message;}
+}
+</script>
+</body>
+</html>

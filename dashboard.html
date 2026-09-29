@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard - PhishGuard AI</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<nav><div class="brand">🛡️ PhishGuard AI</div><a href="/">New Scan</a></nav>
+<main class="container">
+<h1>Security Dashboard</h1>
+<div class="stats">
+<div class="stat"><b>{{total}}</b><span>Total Scans</span></div>
+<div class="stat danger"><b>{{phishing}}</b><span>Phishing</span></div>
+<div class="stat safe"><b>{{legitimate}}</b><span>Legitimate</span></div>
+</div>
+<section class="card table-wrap">
+<h2>Recent Scans</h2>
+<table>
+<thead><tr><th>URL</th><th>Result</th><th>Confidence</th><th>Time</th></tr></thead>
+<tbody>
+{% for row in rows %}
+<tr>
+<td class="url">{{row[0]}}</td>
+<td><span class="badge {{'danger' if row[1]=='Phishing' else 'safe'}}">{{row[1]}}</span></td>
+<td>{{row[2]}}%</td><td>{{row[4]}}</td>
+</tr>
+{% else %}
+<tr><td colspan="4">No scans yet.</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</section>
+</main>
+</body>
+</html>
